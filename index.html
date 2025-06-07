@@ -12,7 +12,7 @@
     body {
       margin: 0;
       padding: 0;
-      background: #000;       
+      background: #000;        
       font-family: 'Inter', sans-serif;
       display: flex;
       justify-content: center;
@@ -140,6 +140,11 @@
       --font-size: 14px; /* Tamaño personalizado para referencia */
       --font-weight: 400; /* Grosor normal */
     }
+    /* Estilos para los decimales */
+    .decimales {
+      font-size: 0.7em; /* Reduce el tamaño de los decimales */
+      vertical-align: baseline; /* Asegura que se mantengan en la misma línea */
+    }
     /* Botón de pantalla completa */
     #verPantallaCompleta {
       display: none;
@@ -183,13 +188,13 @@
 <div class="container" id="captura">
   <img src="comprobante_base.png" alt="Fondo" id="imagen-fondo">
   <input type="text" id="nombre" class="input-overlay" readonly>
-  <input type="text" id="valor" class="input-overlay" readonly>
+  <div id="valor" class="input-overlay"></div>
   <input type="text" id="nequi" class="input-overlay" readonly>
   <div id="fecha" class="input-overlay"></div>
   <input type="text" id="referencia" class="input-overlay" readonly>
 </div>
 <button id="verPantallaCompleta">Ver en Pantalla Completa</button>
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>       
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>        
 <script>
 let claveAcceso = "2025142205";
 const claveAdmin = "1395";
@@ -234,14 +239,14 @@ document.getElementById('guardar-nueva-clave').addEventListener('click', () => {
 document.getElementById('generar').addEventListener('click', () => {
   if (!validarEntradas()) return;
   const container = document.getElementById('captura');
-  const img = document.querySelector('#captura img');       
+  const img = document.querySelector('#captura img');        
   const escala = Math.min(window.innerWidth / 390, 1);
   container.style.setProperty('--escala', escala);
   document.getElementById('pantalla').style.display = 'none';
   container.style.display = 'block';
   // Asignar valores a los campos superpuestos
   document.getElementById('nombre').value = document.getElementById('input-nombre').value;
-  document.getElementById('valor').value = formatValor(document.getElementById('input-valor').value);
+  document.getElementById('valor').innerHTML = formatValor(document.getElementById('input-valor').value);
   document.getElementById('nequi').value = document.getElementById('input-nequi').value;
   generarFecha();
   generarReferencia();
@@ -322,8 +327,9 @@ function generarReferencia() {
 }
 function formatValor(valor) {
   valor = valor.replace(/\D/g, '');
-  if (!valor) return "$ 0,00";
-  return `$ ${valor.replace(/\B(?=(\d{3})+(?!\d))/g, '.')},00`;
+  if (!valor) return "$ 0<span class='decimales'>,00</span>";
+  const entero = valor.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Formatea la parte entera
+  return `$ ${entero}<span class='decimales'>,00</span>`;
 }
 function descargarComprobante(formato) {
   const img = document.querySelector('#captura img');
